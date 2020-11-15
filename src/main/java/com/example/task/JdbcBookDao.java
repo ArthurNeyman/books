@@ -11,34 +11,40 @@ import java.util.List;
 public final class JdbcBookDao implements BookDao {
 
     @Autowired
-    private  JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
-    public List<Book> getAll(){
-        List<Book> list=new ArrayList<>();
+    public List<Book> findAll()  {
 
-        jdbcTemplate.queryForList("select * from book").forEach(book->{
-            list.add(new Book(  (Long)book.get("id"),(String) book.get("author"),
-                                (String) book.get("title"),(String) book.get("description")));
-        });
+        List<Book> list = new ArrayList<>();
+
+        jdbcTemplate.queryForList("select * from book")
+                .forEach(book -> {
+                    list.add(new Book((Long) book.get("id"), (String) book.get("author"),
+                            (String) book.get("title"), (String) book.get("description")));
+                });
 
         return list;
     }
 
-    public Book save(Book book){
+    public Book save(Book book) {
 
-        Long id = jdbcTemplate.queryForObject("select max(id) from book",Long.class);
+        if (book.getId() == null) {
 
-        id = id == null ? 0 : id + 1;
+            Long id = jdbcTemplate.queryForObject("select max(id) from book", Long.class);
 
-        if(book.getId()==null) {
+            id = id == null ? 0 : id + 1;
 
             book.setId(id);
 
             jdbcTemplate.update("insert into book(id,author,title,description) values(?,?,?,?)",
-                    book.getId(),book.getAuthor(),book.getTitle(),book.getDescription());
+                    book.getId(), book.getAuthor(), book.getTitle(), book.getDescription());
 
-            return  book;
+        } else {
+
+            jdbcTemplate.update("update  book set author=? , title=? , description=? where id= ?",
+                    book.getAuthor(), book.getTitle(), book.getDescription(), book.getId());
         }
-        return  book;
+
+        return book;
     }
 }

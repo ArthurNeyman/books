@@ -7,21 +7,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
-@RequestMapping(value = "books")
+@RequestMapping(value = "/books")
 public class BookController {
 
     @Autowired
     private BookDao bookDao;
 
-    @GetMapping("/getBookList")
+    @GetMapping("")
     public ResponseEntity getBookList() {
+
+        List<Book> list;
+
         try {
 
-            List<Book> list = bookDao.getAll().stream().sorted((o1, o2) ->
-                    o2.getTitle().compareTo(o1.getTitle())).collect(Collectors.toList());
+            list = bookDao.findAll().stream().sorted((book1, book2) ->
+                    book2.getTitle().compareTo(book1.getTitle())).collect(Collectors.toList());
 
             return ResponseEntity.status(HttpStatus.OK).body(list);
 
@@ -32,14 +34,12 @@ public class BookController {
         }
     }
 
-    @PostMapping("/addBook")
+    @PostMapping("")
     public ResponseEntity addBook(@RequestBody Book book) {
 
         try {
 
-            book = bookDao.save(book);
-
-            return ResponseEntity.status(HttpStatus.OK).body(book);
+            return ResponseEntity.status(HttpStatus.OK).body(bookDao.save(book));
 
         } catch (Exception e) {
 
@@ -48,21 +48,27 @@ public class BookController {
         }
     }
 
-    @GetMapping("/getBookListByAuthorGroup")
+    @GetMapping("/authors")
     public ResponseEntity getBookListByAuthorGroup() {
 
         Map<String, List<Book>> map = new HashMap<>();
 
         try {
-            bookDao.getAll().forEach(el -> {
-
-                if (map.get(el.getAuthor()) == null)
-                    map.put(el.getAuthor(), Stream.of(el).collect(Collectors.toList()));
+            for(Book book : bookDao.findAll())
+                if (map.get(book.getAuthor()) == null)
+                    map.put(book.getAuthor(), new ArrayList<Book>(Arrays.asList(book)));
                 else
-                    map.get(el.getAuthor()).add(el);
+                    map.get(book.getAuthor()).add(book);
 
+/*
+            bookDao.findAll().forEach(book -> {
+
+                if (map.get(book.getAuthor()) == null)
+                    map.put(book.getAuthor(), new ArrayList<Book>(Arrays.asList(book)));
+                else
+                    map.get(book.getAuthor()).add(book);
             });
-
+*/
             return ResponseEntity.status(HttpStatus.OK).body(map);
 
         } catch (Exception e) {
