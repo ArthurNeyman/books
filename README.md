@@ -1,12 +1,20 @@
 Тестовое задание - JAVA
 Предполагается, что существует база данных с таблицей book:
+
 create table book (
+
 id number not null,
+
 title varchar2(150) not null,
+
 author varchar2(150) not null,
+
 description varchar2(150),
+
 constraint book_pk primary key (id)
+
 );
+
 Необходимо реализовать:
 1. класс Book, являющийся представлением записи таблицы book (т.е. поля класса должны
 соответствовать колонкам таблицы)
