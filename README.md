@@ -29,9 +29,16 @@ constraint book_pk primary key (id)
 Все endpoints должны соответствовать RESTful Resource Naming конвекции и
 получать\возвращать json объекты.
 
+
 Для реализации необходимо использовать:
+
 Spring
+
 Spring MVC (BookController)
+
 Spring DI (заинжектить BookDao в BooksController)
+
 Spring JdbcTemplate (для реализации BookDao)
+
 В одном из endpoint обязательно применить Java Stream AP
+
